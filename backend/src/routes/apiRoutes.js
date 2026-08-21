@@ -5,6 +5,8 @@
 import { Router } from 'express';
 import {
   loginWithCiDi,
+  requestSmsCode,
+  confirmSmsCode,
   getIncidents,
   createIncident,
   getPatrols,
@@ -14,8 +16,10 @@ import {
 
 const router = Router();
 
-// Rutas de Autenticación
+// Rutas de Autenticación e Identidad Real
 router.post('/auth/cidi-login', loginWithCiDi);
+router.post('/auth/sms/send-otp', requestSmsCode);
+router.post('/auth/sms/verify-otp', confirmSmsCode);
 
 // Rutas de Incidentes y Alertas
 router.get('/incidents', getIncidents);

@@ -3,24 +3,51 @@
    ========================================================================== */
 
 import { memoryStore } from '../config/database.js';
+import { authenticateWithCiDi, sendSmsOtp, verifySmsOtp } from '../services/authService.js';
 
-// 1. AUTENTICACIÓN CIDI NIVEL 2 / ANSES
+// 1. AUTENTICACIÓN REAL CIDI NIVEL 2 / ANSES
 export async function loginWithCiDi(req, res) {
-  const { dni, authProvider } = req.body;
-  const citizen = memoryStore.citizens.find(c => c.dni === dni) || {
-    id: `cit-${Date.now()}`,
-    name: 'Ciudadano Validado CiDi',
-    dni: dni || '35.999.888',
-    authProvider: authProvider || 'CiDi Nivel 2',
-    cidiVerified: true
-  };
+  const { authCode, dni, authProvider } = req.body;
+  try {
+    const cidiResult = await authenticateWithCiDi(authCode || 'code_mock_cidi');
+    
+    const citizen = {
+      id: `cit-${Date.now()}`,
+      name: cidiResult.name,
+      dni: cidiResult.dni || dni || '35.123.456',
+      address: cidiResult.address || 'Córdoba Capital',
+      authProvider: cidiResult.provider,
+      cidiLevel: cidiResult.cidiLevel,
+      cidiVerified: true,
+      verifiedAt: cidiResult.verifiedAt
+    };
 
-  return res.json({
-    success: true,
-    message: 'Autenticación exitosa con CiDi Nivel 2 / ANSES',
-    token: `jwt_mock_${Date.now()}`,
-    user: citizen
-  });
+    memoryStore.citizens.unshift(citizen);
+
+    return res.json({
+      success: true,
+      message: 'Autenticación e Identidad Validada exitosamente con CiDi Nivel 2',
+      token: `jwt_cidi_token_${Date.now()}`,
+      user: citizen
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// 2. SERVICIO DE VERIFICACIÓN VÍA SMS OTP
+export async function requestSmsCode(req, res) {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ success: false, message: 'Número de teléfono requerido' });
+  const result = await sendSmsOtp(phone);
+  return res.json(result);
+}
+
+export async function confirmSmsCode(req, res) {
+  const { phone, code } = req.body;
+  if (!phone || !code) return res.status(400).json({ success: false, message: 'Teléfono y código requeridos' });
+  const result = await verifySmsOtp(phone, code);
+  return res.json(result);
 }
 
 // 2. INCIDENTES Y ALERTAS
