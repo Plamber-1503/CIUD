@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ojos en Alerta - Seguridad Urbana Córdoba</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Estilos Personalizados del Sistema de Diseño (Branding PDF) -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- BARRA SUPERIOR DE SIMULACIÓN Y SELECCIÓN DE ROLES DEMO -->
+  <div class="demo-bar">
+    <div class="demo-title">
+      <span class="demo-badge">MODO DEMO UBER</span>
+      <span>Simulador Multi-Rol Real-Time</span>
+    </div>
+
+    <!-- SELECCIÓN DE MODO DE PANTALLA & PERFIL -->
+    <div class="demo-controls">
+      <div class="view-mode-selector">
+        <span class="view-mode-label">Ver en:</span>
+        <div class="view-mode-toggle">
+          <button type="button" id="btnViewPc" class="view-mode-btn active" title="Ver en Pantalla Completa Escritorio">
+            <span>🖥️ Modo PC</span>
+          </button>
+          <button type="button" id="btnViewMobile" class="view-mode-btn" title="Ver Simulador de Smartphone">
+            <span>📱 Modo Móvil</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="role-selector">
+        <label for="roleSelect" style="font-size:0.78rem; font-weight:600;">Probar Perfil:</label>
+        <select id="roleSelect">
+          <optgroup label="📱 Ciudadanos (Demandantes)">
+            <option value="cit-1">👤 Usuario 1 (Juan Pérez)</option>
+            <option value="cit-2">👤 Usuario 2 (María González)</option>
+            <option value="cit-3">👤 Usuario 3 (Carlos Rodríguez)</option>
+            <option value="cit-4">👤 Usuario 4 (Ana Martínez)</option>
+            <option value="cit-5">👤 Usuario 5 (Lucas Silva)</option>
+          </optgroup>
+          <optgroup label="🚔 Patrullas (Móviles de Respuesta)">
+            <option value="pat-101">🚔 Patrulla 1 (Móvil M-101 Centro)</option>
+            <option value="pat-102">🚔 Patrulla 2 (Móvil M-102 Sur)</option>
+            <option value="pat-103">🚔 Patrulla 3 (Móvil M-103 Norte)</option>
+          </optgroup>
+          <optgroup label="🖥️ Central de Monitoreo">
+            <option value="central-01">🖥️ Central de Monitoreo (Admin)</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESCENARIO PRINCIPAL CON MARCO DE DISPOSITIVO MÓVIL SIMULADO -->
+  <div class="device-stage" id="deviceStage">
+    <div class="phone-frame-container" id="phoneFrameContainer">
+      
+      <!-- ELEMENTOS SIMULADOS DE SMARTPHONE (SLOTS DE NOTCH & BARRA DE ESTADO) -->
+      <div class="phone-notch"></div>
+      <div class="phone-status-bar">
+        <span class="phone-time" id="phoneClock">12:45</span>
+        <span class="phone-carrier">Ojos en Alerta</span>
+        <div class="phone-icons">
+          <span>5G</span>
+          <span>100% 🔋</span>
+        </div>
+      </div>
+
+      <!-- APP HEADER INSTITUCIONAL CON MARCA Y LOGOTIPOS DEL PDF -->
+      <header class="app-header">
+        <div class="brand-container">
+          <!-- Isotipo Vectorial Ojo + Pin GPS -->
+          <svg class="brand-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 95C50 95 85 62 85 38C85 18.67 69.33 3 50 3C30.67 3 15 18.67 15 38C15 62 50 95 50 95Z" fill="#00AEEF"/>
+            <ellipse cx="50" cy="38" rx="28" ry="18" fill="white"/>
+            <circle cx="50" cy="38" r="12" fill="#004C8C"/>
+            <circle cx="47" cy="35" r="4" fill="#043867"/>
+            <circle cx="53" cy="33" r="2.5" fill="white"/>
+          </svg>
+          <div class="brand-text-block">
+            <span class="brand-title">OJOS EN ALERTA</span>
+            <span class="brand-subtitle">SEGURIDAD URBANA CÓRDOBA</span>
+          </div>
+        </div>
+        <div class="institutional-badge">
+          <span style="font-weight:700;">MINISTERIO DE SEGURIDAD</span>
+        </div>
+      </header>
+
+      <!-- CONTENEDOR PRINCIPAL: MAPA + VISTAS FLOTANTES -->
+      <main class="app-container">
+        <!-- Mapa Interactivo Leaflet -->
+        <div id="map"></div>
+
+        <!-- PANELES FLOTANTES DE VISTA SEGÚN EL ROL -->
+        <div class="view-panel" id="citizenView"></div>
+        <div class="view-panel hidden" id="patrolView"></div>
+        <div class="view-panel hidden" id="centralView"></div>
+
+        <!-- MODAL POP-UP ENTRANTE PARA PATRULLAS (UBER DISPATCH) -->
+        <div id="incomingDispatchModal" class="hidden"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Lógica de Aplicación Web JS (Módulos ES6) -->
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Lógica de Aplicación Web JS (Módulos ES6) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
