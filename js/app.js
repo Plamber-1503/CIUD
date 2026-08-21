@@ -52,8 +52,133 @@ class OjosEnAlertaApp {
     this.initMap();
     this.setupEventListeners();
     this.setupViewModeSwitcher();
+    this.setupAuthModalLogic();
     this.renderCurrentRoleView();
     this.startPatrolAnimationLoop();
+  }
+
+  // ------------------------------------------------------------------------
+  // 1.INICIO DE SESIÓN Y LÓGICA DEL MODAL DE AUTENTICACIÓN CIDI / ANSES
+  // ------------------------------------------------------------------------
+  setupAuthModalLogic() {
+    const authModal = document.getElementById('authModal');
+    const tabCitizen = document.getElementById('tabAuthCitizen');
+    const tabPatrol = document.getElementById('tabAuthPatrol');
+    const formCitizen = document.getElementById('formCitizenAuth');
+    const formPatrol = document.getElementById('formPatrolAuth');
+
+    const btnCidi = document.getElementById('btnAuthCidi');
+    const btnAnses = document.getElementById('btnAuthAnses');
+    const btnSubmitCitizen = document.getElementById('btnSubmitCitizenAuth');
+    const btnSubmitPatrol = document.getElementById('btnSubmitPatrolAuth');
+
+    if (!authModal) return;
+
+    const btnOpenLoginModal = document.getElementById('btnOpenLoginModal');
+    if (btnOpenLoginModal) {
+      btnOpenLoginModal.addEventListener('click', () => {
+        authModal.classList.remove('hidden');
+      });
+    }
+
+    // Verificar si ya hay una sesión validada activa en localStorage
+    const savedUser = localStorage.getItem('ojos_user_session');
+    if (savedUser) {
+      try {
+        const userObj = JSON.parse(savedUser);
+        this.currentUser = userObj;
+        authModal.classList.add('hidden');
+      } catch (e) {
+        authModal.classList.remove('hidden');
+      }
+    } else {
+      authModal.classList.remove('hidden');
+    }
+
+    // Pestañas
+    if (tabCitizen && tabPatrol) {
+      tabCitizen.addEventListener('click', () => {
+        tabCitizen.classList.add('active');
+        tabPatrol.classList.remove('active');
+        formCitizen.classList.remove('hidden');
+        formPatrol.classList.add('hidden');
+      });
+      tabPatrol.addEventListener('click', () => {
+        tabPatrol.classList.add('active');
+        tabCitizen.classList.remove('active');
+        formPatrol.classList.remove('hidden');
+        formCitizen.classList.add('hidden');
+      });
+    }
+
+    // Botón CiDi Nivel 2
+    if (btnCidi) {
+      btnCidi.addEventListener('click', () => {
+        this.currentRoleType = 'citizen';
+        this.currentUser = { ...DEMO_CITIZENS[0], authProvider: 'CiDi Nivel 2' };
+        localStorage.setItem('ojos_user_session', JSON.stringify(this.currentUser));
+        authModal.classList.add('hidden');
+        this.renderCurrentRoleView();
+        this.updateMapElements();
+      });
+    }
+
+    // Botón ANSES
+    if (btnAnses) {
+      btnAnses.addEventListener('click', () => {
+        this.currentRoleType = 'citizen';
+        this.currentUser = { ...DEMO_CITIZENS[1], authProvider: 'ANSES / Mi Argentina' };
+        localStorage.setItem('ojos_user_session', JSON.stringify(this.currentUser));
+        authModal.classList.add('hidden');
+        this.renderCurrentRoleView();
+        this.updateMapElements();
+      });
+    }
+
+    // Formulario DNI Manual
+    if (btnSubmitCitizen) {
+      btnSubmitCitizen.addEventListener('click', () => {
+        const dniVal = document.getElementById('authDniInput')?.value || '35.123.456';
+        this.currentRoleType = 'citizen';
+        this.currentUser = {
+          id: `cit-${Date.now()}`,
+          name: 'Ciudadano Registrado',
+          dni: dniVal,
+          address: 'Av. Colón 1234, Córdoba',
+          authProvider: 'Validación DNI',
+          coords: [-31.4135, -64.1867]
+        };
+        localStorage.setItem('ojos_user_session', JSON.stringify(this.currentUser));
+        authModal.classList.add('hidden');
+        this.renderCurrentRoleView();
+        this.updateMapElements();
+      });
+    }
+
+    // Formulario Policial
+    if (btnSubmitPatrol) {
+      btnSubmitPatrol.addEventListener('click', () => {
+        const selVal = document.getElementById('patrolRoleSelect')?.value || 'pat-101';
+        if (selVal.startsWith('pat-')) {
+          this.currentRoleType = 'patrol';
+          this.currentUser = this.patrols.find((p) => p.id === selVal);
+        } else {
+          this.currentRoleType = 'central';
+          this.currentUser = CENTRAL_OPERATOR;
+        }
+        localStorage.setItem('ojos_user_session', JSON.stringify(this.currentUser));
+        authModal.classList.add('hidden');
+        this.renderCurrentRoleView();
+        this.updateMapElements();
+      });
+    }
+  }
+
+  showAuthModal() {
+    const authModal = document.getElementById('authModal');
+    if (authModal) {
+      authModal.classList.remove('hidden');
+    }
   }
 
   // ------------------------------------------------------------------------
